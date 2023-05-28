@@ -32,6 +32,12 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
   release:
     name: Create GitHub Release
     needs: build
@@ -63,3 +69,20 @@ jobs:
           body: ${{ steps.commit_message.outputs.message }}
           draft: false
           prerelease: false
+
+      - name: Download APK
+        uses: actions/download-artifact@v2
+        with:
+          name: app-release
+          path: ${{ github.workspace }}/app-release
+
+      - name: Attach APK to Release
+        id: attach_apk
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/app-release/app-release.apk
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
