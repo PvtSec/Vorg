@@ -44,6 +44,10 @@ jobs:
       - name: Set up Git
         run: git config --global user.name 'GitHub Actions' && git config --global user.email 'actions@github.com'
 
+      - name: Get Commit Message
+        id: commit_message
+        run: echo "::set-output name=message::$(git log --format=%B -n 1 ${{ github.sha }})"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -52,7 +56,6 @@ jobs:
         with:
           tag_name: ${{ github.sha }}[:6]
           release_name: Release ${{ github.sha }}
-          body: |
-            This is an automatically generated release.
+          body: ${{ steps.commit_message.outputs.message }}
           draft: false
           prerelease: false
