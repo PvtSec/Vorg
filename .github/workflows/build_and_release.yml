@@ -48,13 +48,17 @@ jobs:
         id: commit_message
         run: echo "::set-output name=message::$(git log --format=%B -n 1 ${{ github.sha }})"
 
+      - name: Create Tag
+        id: create_tag
+        run: echo "::set-output name=tag::$(echo ${{ github.sha }} | cut -c 1-6)"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}[:6]
+          tag_name: ${{ steps.create_tag.outputs.tag }}
           release_name: Release ${{ github.sha }}
           body: ${{ steps.commit_message.outputs.message }}
           draft: false
