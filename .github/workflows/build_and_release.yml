@@ -65,7 +65,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
         with:
           tag_name: ${{ steps.create_tag.outputs.tag }}
-          release_name: Release ${{ github.sha }}
+          release_name: Release ${{ steps.create_tag.outputs.tag }}
           body: ${{ steps.commit_message.outputs.message }}
           draft: false
           prerelease: false
@@ -84,5 +84,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/app-release/app-release.apk
-          asset_name: app-release.apk
+          asset_name: Vorg_${{ steps.create_tag.outputs.tag }}.apk
           asset_content_type: application/vnd.android.package-archive
