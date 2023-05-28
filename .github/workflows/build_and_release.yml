@@ -1,0 +1,88 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3.5.2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.10.0
+        with:
+          flutter-version: "3.x"
+          channel: "stable"
+
+      - name: Cache Flutter SDK
+        uses: actions/cache@v1.2.1
+        with:
+          path: ${{ env.HOME }}/.flutter
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Restore dependencies from cache
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3.5.2
+
+      - name: Set up Git
+        run: git config --global user.name 'GitHub Actions' && git config --global user.email 'actions@github.com'
+
+      - name: Get Commit Message
+        id: commit_message
+        run: echo "::set-output name=message::$(git log --format=%B -n 1 ${{ github.sha }})"
+
+      - name: Create Tag
+        id: create_tag
+        run: echo "::set-output name=tag::$(echo ${{ github.sha }} | cut -c 1-6)"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: Release ${{ steps.create_tag.outputs.tag }}
+          body: ${{ steps.commit_message.outputs.message }}
+          draft: false
+          prerelease: false
+
+      - name: Download APK
+        uses: actions/download-artifact@v2.1.1
+        with:
+          name: app-release
+          path: ${{ github.workspace }}/app-release
+
+      - name: Attach APK to Release
+        id: attach_apk
+        uses: actions/upload-release-asset@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/app-release/app-release.apk
+          asset_name: Vorg_${{ steps.create_tag.outputs.tag }}.apk
+          asset_content_type: application/vnd.android.package-archive
