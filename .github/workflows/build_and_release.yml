@@ -18,8 +18,15 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.x"
+          channel: "stable"
 
-      - name: Install dependencies
+      - name: Cache Flutter SDK
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.HOME }}/.flutter
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Restore dependencies from cache
         run: flutter pub get
 
       - name: Build APK
