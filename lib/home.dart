@@ -1,3 +1,4 @@
+import 'package:Vorg/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,7 +11,7 @@ class HomePage extends StatelessWidget {
         return true;
       },
       child: Scaffold(
-        body: Container(),
+        body: LoginPage(),
       ),
     );
   }

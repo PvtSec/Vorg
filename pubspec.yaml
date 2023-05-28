@@ -8,10 +8,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.4
-  shared_preferences: ^2.1.0
   http: ^1.0.0
   fluttertoast: ^8.2.2
+  google_fonts: ^4.0.5
+  cupertino_icons: ^1.0.4
+  shared_preferences: ^2.1.0
 
 
 dev_dependencies:
