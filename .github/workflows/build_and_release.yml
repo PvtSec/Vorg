@@ -43,7 +43,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
+          tag_name: ${{ github.sha }}[:6]
           release_name: Release ${{ github.sha }}
           body: |
             This is an automatically generated release.
