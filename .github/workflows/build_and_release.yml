@@ -12,16 +12,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@latest
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@latest
         with:
           flutter-version: "3.x"
           channel: "stable"
 
       - name: Cache Flutter SDK
-        uses: actions/cache@v3
+        uses: actions/cache@latest
         with:
           path: ${{ env.HOME }}/.flutter
           key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
@@ -33,7 +33,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@latest
         with:
           name: app-release
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@latest
 
       - name: Set up Git
         run: git config --global user.name 'GitHub Actions' && git config --global user.email 'actions@github.com'
@@ -71,14 +71,14 @@ jobs:
           prerelease: false
 
       - name: Download APK
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@latest
         with:
           name: app-release
           path: ${{ github.workspace }}/app-release
 
       - name: Attach APK to Release
         id: attach_apk
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@latest
         env:
           GITHUB_TOKEN: ${{ secrets.VORG_TOKEN }}
         with:
